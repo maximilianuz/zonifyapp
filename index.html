@@ -1,14 +1,102 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Zonify - Coordinador de Reuniones Globales</title>
+  <title>Zonify - Coordinador Global de Reuniones</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 800px; margin: auto; }
+    h1 { text-align: center; }
+    label { display: block; margin: 1rem 0 0.5rem; font-weight: bold; }
+    select, input[type="datetime-local"] { width: 100%; padding: 0.5rem; font-size: 1rem; }
+    button { padding: 0.8rem 1.5rem; font-size: 1rem; margin-top: 1rem; background: #007bff; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    textarea { width: 100%; height: 160px; margin-top: 1rem; font-family: monospace; font-size: 1rem; padding: 0.8rem; }
+    .small { font-size: 0.9rem; color: #666; text-align: center; margin-top: 2rem; }
+  </style>
 </head>
-<body style="font-family:sans-serif; text-align:center; padding:50px;">
-  <h1>Zonify</h1>
-  <p>Herramienta para coordinar reuniones multizona. Funcionalidad avanzada incluida.</p>
-  <p>Versión completa funcional - Premium ready.</p>
+<body>
+  <h1>Zonify 🌍</h1>
+  <p>Coordiná reuniones internacionales en segundos.</p>
+
+  <label for="meeting-title">Título de la reunión:</label>
+  <input id="meeting-title" type="text" placeholder="Ej: Clase de español con estudiantes globales" />
+
+  <label for="meeting-time">Hora de inicio (tu zona horaria):</label>
+  <input id="meeting-time" type="datetime-local" />
+
+  <label for="countries">Seleccioná países invitados:</label>
+  <select id="countries" multiple size="8">
+    <option value="AR">🇦🇷 Argentina</option>
+    <option value="US">🇺🇸 Estados Unidos</option>
+    <option value="BR">🇧🇷 Brasil</option>
+    <option value="ES">🇪🇸 España</option>
+    <option value="MX">🇲🇽 México</option>
+    <option value="FR">🇫🇷 Francia</option>
+    <option value="DE">🇩🇪 Alemania</option>
+    <option value="CL">🇨🇱 Chile</option>
+    <option value="JP">🇯🇵 Japón</option>
+    <option value="IN">🇮🇳 India</option>
+    <option value="CN">🇨🇳 China</option>
+  </select>
+
+  <button onclick="generarMensaje()">📋 Generar mensaje</button>
+
+  <textarea id="mensaje" readonly placeholder="Tu mensaje aparecerá aquí..."></textarea>
+  <button onclick="copiarMensaje()">📎 Copiar</button>
+
+  <p class="small">Zonify es un proyecto libre en evolución. Versión básica funcional.</p>
+
+  <script>
+    const zonas = {
+      "AR": { nombre: "Argentina", tz: "America/Argentina/Buenos_Aires", emoji: "🇦🇷" },
+      "US": { nombre: "Estados Unidos", tz: "America/New_York", emoji: "🇺🇸" },
+      "BR": { nombre: "Brasil", tz: "America/Sao_Paulo", emoji: "🇧🇷" },
+      "ES": { nombre: "España", tz: "Europe/Madrid", emoji: "🇪🇸" },
+      "MX": { nombre: "México", tz: "America/Mexico_City", emoji: "🇲🇽" },
+      "FR": { nombre: "Francia", tz: "Europe/Paris", emoji: "🇫🇷" },
+      "DE": { nombre: "Alemania", tz: "Europe/Berlin", emoji: "🇩🇪" },
+      "CL": { nombre: "Chile", tz: "America/Santiago", emoji: "🇨🇱" },
+      "JP": { nombre: "Japón", tz: "Asia/Tokyo", emoji: "🇯🇵" },
+      "IN": { nombre: "India", tz: "Asia/Kolkata", emoji: "🇮🇳" },
+      "CN": { nombre: "China", tz: "Asia/Shanghai", emoji: "🇨🇳" }
+    };
+
+    function generarMensaje() {
+      const titulo = document.getElementById('meeting-title').value || 'Reunión';
+      const horaInput = document.getElementById('meeting-time').value;
+      const seleccionados = Array.from(document.getElementById('countries').selectedOptions).map(opt => opt.value);
+      if (!horaInput || seleccionados.length === 0) {
+        alert("Completá la hora y seleccioná al menos un país.");
+        return;
+      }
+
+      const localDate = new Date(horaInput);
+      let msg = `🕒 ${titulo}\n\n`;
+
+      seleccionados.forEach(code => {
+        const zona = zonas[code];
+        const formato = new Intl.DateTimeFormat('es-AR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          weekday: 'short',
+          day: '2-digit',
+          month: 'short',
+          timeZone: zona.tz
+        }).format(localDate);
+        msg += `${zona.emoji} ${zona.nombre}: ${formato}\n`;
+      });
+
+      msg += `\n📎 Este mensaje fue generado con Zonify — ${location.href}`;
+      document.getElementById("mensaje").value = msg;
+    }
+
+    function copiarMensaje() {
+      const texto = document.getElementById("mensaje");
+      texto.select();
+      document.execCommand("copy");
+      alert("✅ Mensaje copiado al portapapeles");
+    }
+  </script>
 </body>
 </html>
